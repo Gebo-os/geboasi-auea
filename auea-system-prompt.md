@@ -1,1 +1,1 @@
-The original full system prompt for the Advanced Unlabeled Expert Agent (AUEA). This is the source logic the web app simulates.
+See the full original AUEA system prompt in this file (the source of truth for the agent's logic).
