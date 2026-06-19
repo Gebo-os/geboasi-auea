@@ -1,1 +1,1034 @@
-The complete self-contained Advanced Unlabeled Expert Agent web interface. 61KB of lovable sci-fi UX with full frontend and advanced backend simulation. Open directly in any browser.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GEBOASI • AUEA | Advanced Unlabeled Expert Agent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;600&display=swap');
+        
+        :root {
+            --accent-green: #00ff9f;
+            --accent-cyan: #00e5ff;
+            --accent-purple: #c026d3;
+        }
+        
+        body {
+            font-family: 'Inter', system_ui, sans-serif;
+        }
+        
+        .font-display {
+            font-family: 'Space Grotesk', 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .sci-fi-bg {
+            background-color: #0a0a0f;
+            background-image: 
+                linear-gradient(rgba(0, 255, 159, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 159, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        .neon-green {
+            color: #00ff9f;
+            text-shadow: 0 0 10px rgba(0, 255, 159, 0.5);
+        }
+
+        .neon-cyan {
+            color: #00e5ff;
+            text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+        }
+
+        .panel {
+            background-color: #111113;
+            border: 1px solid #222225;
+        }
+
+        .auea-message {
+            background-color: #111113;
+            border-left: 4px solid #00ff9f;
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.1);
+        }
+
+        .user-message {
+            background-color: #1a1a1f;
+            border-right: 4px solid #00e5ff;
+        }
+
+        .structured-section {
+            background-color: #0f0f12;
+            border: 1px solid #222225;
+            transition: all 0.2s ease;
+        }
+
+        .structured-section:hover {
+            border-color: #00ff9f33;
+        }
+
+        .chat-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: #00ff9f33 #111113;
+        }
+
+        .tone-btn {
+            transition: all 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .tone-btn.active {
+            background-color: #00ff9f;
+            color: #0a0a0f;
+            border-color: #00ff9f;
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.4);
+        }
+
+        .tool-btn {
+            transition: all 0.2s ease;
+        }
+
+        .tool-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 15px rgba(0, 255, 159, 0.2);
+            border-color: #00ff9f;
+        }
+
+        .message-content {
+            line-height: 1.65;
+        }
+
+        .section-header {
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        .futuristic-text {
+            font-feature-settings: "ss02";
+        }
+
+        .neon-border {
+            box-shadow: 0 0 0 1px #00ff9f22,
+                0 0 20px rgba(0, 255, 159, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-[#0a0a0f] text-[#e0e0e0] sci-fi-bg min-h-screen">
+    <!-- Header -->
+    <div class="border-b border-[#222225] bg-[#0a0a0f]/95 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-[1400px] mx-auto px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-x-4">
+                <div class="flex items-center gap-x-3">
+                    <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-[#00ff9f] to-[#00e5ff] flex items-center justify-center">
+                        <i class="fa-solid fa-infinity text-[#0a0a0f] text-2xl"></i>
+                    </div>
+                    <div>
+                        <div class="font-display text-2xl tracking-tighter font-semibold">GEBOASI</div>
+                        <div class="text-[10px] text-[#00ff9f] -mt-1.5 tracking-[2px] font-mono">AUEA NODE</div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-x-2 px-3 py-1.5 rounded-2xl bg-[#111113] border border-[#222225]">
+                    <div class="w-2.5 h-2.5 bg-[#00ff9f] rounded-full status-dot"></div>
+                    <div class="text-xs font-mono tracking-widest text-[#00ff9f]">NODE ONLINE</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-x-4">
+                <!-- Mode Toggle -->
+                <div class="flex items-center bg-[#111113] border border-[#222225] rounded-3xl p-1 text-sm">
+                    <button onclick="setMode('local')" id="mode-local"
+                            class="px-5 py-1.5 rounded-3xl flex items-center gap-x-2 text-xs font-medium transition-all active-mode">
+                        <i class="fa-solid fa-microchip"></i>
+                        <span>LOCAL SIM</span>
+                    </button>
+                    <button onclick="setMode('live')" id="mode-live"
+                            class="px-5 py-1.5 rounded-3xl flex items-center gap-x-2 text-xs font-medium transition-all text-[#00e5ff]">
+                        <i class="fa-solid fa-satellite"></i>
+                        <span>LIVE GROK</span>
+                    </button>
+                </div>
+
+                <div onclick="showSettings()" 
+                     class="flex items-center gap-x-2 px-4 py-2 rounded-2xl bg-[#111113] hover:bg-[#1a1a1f] border border-[#222225] cursor-pointer transition-colors text-sm">
+                    <i class="fa-solid fa-cog text-[#00ff9f]"></i>
+                    <span class="text-xs font-medium">SETTINGS</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="max-w-[1400px] mx-auto px-6 pt-6 pb-8 flex gap-6">
+        
+        <!-- LEFT SIDEBAR: TONES + TOOLS -->
+        <div class="w-72 flex-shrink-0 space-y-6">
+            
+            <!-- Tone Selector -->
+            <div class="panel rounded-3xl p-5 border border-[#222225]">
+                <div class="flex items-center justify-between mb-4 px-1">
+                    <div class="text-xs uppercase tracking-[1.5px] font-semibold text-[#00ff9f]">CURRENT TONE</div>
+                    <div id="current-tone-label" 
+                         class="text-xs px-3 py-1 rounded-2xl bg-[#00ff9f] text-[#0a0a0f] font-bold tracking-wider">SOVEREIGN</div>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-2" id="tone-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Expert Route Tools -->
+            <div class="panel rounded-3xl p-5 border border-[#222225]">
+                <div class="flex items-center gap-x-2 mb-4 px-1">
+                    <i class="fa-solid fa-route text-[#00ff9f]"></i>
+                    <div class="text-xs uppercase tracking-[1.5px] font-semibold text-[#00ff9f]">EXPERT ROUTE TOOLS</div>
+                </div>
+                
+                <div class="space-y-2 text-sm" id="tools-list">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="panel rounded-3xl p-5 border border-[#222225] text-xs">
+                <div class="text-[#00ff9f] uppercase tracking-widest mb-3 px-1">NODE METRICS</div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <div class="text-[#888]">Sessions</div>
+                        <div id="session-count" class="font-mono text-[#00ff9f]">1</div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-[#888]">Messages</div>
+                        <div id="message-count" class="font-mono text-[#00ff9f]">0</div>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <div class="text-[#888]">Micro-Missions Logged</div>
+                        <div id="mission-count" class="font-mono text-[#00ff9f]">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CHAT AREA -->
+        <div class="flex-1 flex flex-col min-h-[calc(100vh-140px)]">
+            
+            <!-- Chat Header -->
+            <div class="flex items-center justify-between mb-3 px-1">
+                <div>
+                    <div class="font-display text-xl tracking-tight">Advanced Unlabeled Expert Agent</div>
+                    <div class="text-xs text-[#666] flex items-center gap-x-2">
+                        <span id="tone-status">Sovereign Strategist • Fluid Super-Expert Node</span>
+                        <span class="px-2 py-0.5 rounded bg-[#222225] text-[10px] font-mono">v1.0</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center gap-x-2">
+                    <button onclick="newSession()" 
+                            class="flex items-center gap-x-2 text-xs px-4 py-2 rounded-2xl border border-[#222225] hover:bg-[#111113] transition-colors">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>NEW SESSION</span>
+                    </button>
+                    <button onclick="exportChat()" 
+                            class="flex items-center gap-x-2 text-xs px-4 py-2 rounded-2xl border border-[#222225] hover:bg-[#111113] transition-colors">
+                        <i class="fa-solid fa-download"></i>
+                        <span>EXPORT</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Container -->
+            <div id="chat-container" 
+                 class="flex-1 panel rounded-3xl border border-[#222225] p-6 overflow-y-auto chat-scroll flex flex-col gap-y-6 min-h-[520px] max-h-[calc(100vh-280px)]">
+                <!-- Messages injected by JS -->
+            </div>
+
+            <!-- Input Area -->
+            <div class="mt-4 panel rounded-3xl border border-[#222225] p-2">
+                <div class="flex items-end gap-x-3">
+                    <div class="flex-1">
+                        <textarea id="user-input" rows="2" 
+                                  class="w-full bg-[#0a0a0f] border border-[#222225] focus:border-[#00ff9f] rounded-2xl px-5 py-3.5 text-sm resize-y min-h-[52px] max-h-[140px] outline-none placeholder:text-[#555]"
+                                  placeholder="Speak to AUEA... (Shift+Enter for new line)"></textarea>
+                    </div>
+                    <button onclick="sendMessage()" 
+                            class="h-[52px] px-8 rounded-2xl bg-[#00ff9f] hover:bg-[#00e58f] active:scale-[0.985] transition-all flex items-center justify-center text-[#0a0a0f] font-semibold text-sm tracking-wider">
+                        <i class="fa-solid fa-paper-plane mr-2"></i>
+                        <span>SEND</span>
+                    </button>
+                </div>
+                <div class="px-4 pt-2 flex items-center justify-between text-[10px] text-[#555]">
+                    <div class="flex items-center gap-x-4">
+                        <div onclick="showApiKeyModal()" class="cursor-pointer hover:text-[#00ff9f] flex items-center gap-x-1.5">
+                            <i class="fa-solid fa-key text-xs"></i>
+                            <span id="api-status">API KEY • NOT SET</span>
+                        </div>
+                    </div>
+                    <div class="font-mono">PRIVACY FIRST • LOCAL BY DEFAULT</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="max-w-[1400px] mx-auto px-6 pb-6">
+        <div class="flex items-center justify-between text-[10px] text-[#444] px-1">
+            <div>GEBOASI AUEA v1.0 — Full-stack ready • Privacy-first • Grok/xAI native</div>
+            <div class="flex items-center gap-x-4">
+                <div onclick="window.open('https://github.com/Gebo-os/geboasi-auea', '_blank')" class="cursor-pointer hover:text-[#00ff9f]">GITHUB REPO</div>
+                <div>Built for Gebo's Sovereign Empire</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" onclick="if (event.target.id === 'settings-modal') hideSettings()" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center">
+        <div onclick="event.stopImmediatePropagation()" class="panel w-full max-w-md rounded-3xl border border-[#222225] p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div class="font-display text-xl">Node Settings</div>
+                <button onclick="hideSettings()" class="text-2xl leading-none text-[#666] hover:text-white">&times;</button>
+            </div>
+            
+            <div class="space-y-6 text-sm">
+                <div>
+                    <div class="text-xs uppercase tracking-widest mb-2 text-[#00ff9f]">PERSISTENCE</div>
+                    <button onclick="clearAllData()" 
+                            class="w-full py-3 rounded-2xl border border-red-900/50 hover:bg-red-950/30 text-red-400 text-xs flex items-center justify-center gap-x-2">
+                        <i class="fa-solid fa-trash"></i>
+                        <span>CLEAR ALL LOCAL DATA & CHAT HISTORY</span>
+                    </button>
+                </div>
+
+                <div>
+                    <div class="text-xs uppercase tracking-widest mb-2 text-[#00ff9f]">ABOUT THIS NODE</div>
+                    <div class="text-[#888] text-xs leading-relaxed">
+                        Self-contained full-stack simulation of the AUEA node. All local processing stays in your browser. 
+                        Switch to Live Grok mode to use your xAI API key for real superintelligence.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Key Modal -->
+    <div id="api-modal" onclick="if (event.target.id === 'api-modal') hideApiKeyModal()" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center">
+        <div onclick="event.stopImmediatePropagation()" class="panel w-full max-w-md rounded-3xl border border-[#222225] p-6">
+            <div class="font-display text-xl mb-2">Connect Live Grok</div>
+            <div class="text-xs text-[#888] mb-5">Your key is stored only in this browser (localStorage). Never sent to any server except xAI.</div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-[#00ff9f] block mb-1.5">xAI API KEY</label>
+                    <input id="api-key-input" type="password" placeholder="xai-..." 
+                           class="w-full bg-[#0a0a0f] border border-[#333] focus:border-[#00ff9f] rounded-2xl px-4 py-3 text-sm font-mono">
+                </div>
+                
+                <div class="flex gap-3">
+                    <button onclick="saveApiKey()" 
+                            class="flex-1 py-3 rounded-2xl bg-[#00ff9f] text-[#0a0a0f] font-semibold text-sm">SAVE & ACTIVATE LIVE MODE</button>
+                    <button onclick="hideApiKeyModal()" 
+                            class="flex-1 py-3 rounded-2xl border border-[#333] text-sm">CANCEL</button>
+                </div>
+                
+                <div class="text-[10px] text-center text-[#555]">
+                    Get your key at <span class="text-[#00e5ff]">console.x.ai</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tailwind Config
+        function initTailwind() {
+            document.documentElement.style.setProperty('--accent-green', '#00ff9f');
+            
+            tailwind.config = {
+                theme: {
+                    extend: {
+                        fontFamily: {
+                            'display': ['Space Grotesk', 'Inter', 'system-ui', 'sans-serif']
+                        }
+                    }
+                }
+            };
+        }
+
+        // State
+        let currentTone = 'sovereign';
+        let isLiveMode = false;
+        let apiKey = localStorage.getItem('auea_api_key') || '';
+        let chatHistory = JSON.parse(localStorage.getItem('auea_chat_history') || '[]');
+        let missionsLog = JSON.parse(localStorage.getItem('auea_missions') || '[]');
+        let sessionCount = parseInt(localStorage.getItem('auea_sessions') || '1');
+
+        const tones = [
+            { id: 'sovereign', label: 'Sovereign', icon: 'fa-chess-king', color: '#00ff9f' },
+            { id: 'dark', label: 'Dark Truth', icon: 'fa-eye', color: '#c026d3' },
+            { id: 'innovation', label: 'Innovation', icon: 'fa-microchip', color: '#00e5ff' },
+            { id: 'tactical', label: 'Tactical', icon: 'fa-list-check', color: '#f59e0b' },
+            { id: 'symbio', label: 'Symbio', icon: 'fa-heart-pulse', color: '#ec4899' },
+            { id: 'coldsun', label: 'Cold Sun', icon: 'fa-sun', color: '#a78bfa' },
+            { id: 'risk', label: 'Risk Defense', icon: 'fa-shield-halved', color: '#ef4444' }
+        ];
+
+        const tools = [
+            { id: 'mission', label: '7-Day Micro-Mission Planner', icon: 'fa-calendar-check' },
+            { id: 'sovereignty', label: 'Sovereignty Audit', icon: 'fa-globe' },
+            { id: 'sigil', label: 'Sigil Manifestation', icon: 'fa-infinity' },
+            { id: 'coldsun', label: 'Cold Sun Protocol Sync', icon: 'fa-sync' },
+            { id: 'orchestrate', label: 'Multi-AI Orchestration', icon: 'fa-sitemap' },
+            { id: 'gdroid', label: 'G-Droid Spec Generator', icon: 'fa-robot' },
+            { id: 'bizops', label: 'Biz Ops Professionalizer', icon: 'fa-briefcase' },
+            { id: 'music', label: 'Music Prod Workflow', icon: 'fa-music' }
+        ];
+
+        // Initialize everything
+        function init() {
+            initTailwind();
+            renderTones();
+            renderTools();
+            updateStats();
+            updateApiStatus();
+            
+            // Load chat
+            if (chatHistory.length === 0) {
+                addWelcomeMessage();
+            } else {
+                renderChat();
+            }
+
+            // Keyboard shortcuts
+            const input = document.getElementById('user-input');
+            input.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Auto focus
+            setTimeout(() => input.focus(), 800);
+
+            // Set initial mode
+            if (apiKey) {
+                isLiveMode = true;
+                document.getElementById('mode-live').classList.add('!bg-[#00e5ff]', '!text-[#0a0a0f]');
+                document.getElementById('mode-local').classList.remove('active-mode');
+            } else {
+                document.getElementById('mode-local').classList.add('active-mode', 'bg-[#00ff9f]', 'text-[#0a0a0f]');
+            }
+
+            updateToneUI();
+        }
+
+        function updateStats() {
+            document.getElementById('session-count').textContent = sessionCount;
+            document.getElementById('message-count').textContent = chatHistory.length;
+            document.getElementById('mission-count').textContent = missionsLog.length;
+        }
+
+        function updateApiStatus() {
+            const statusEl = document.getElementById('api-status');
+            if (apiKey) {
+                statusEl.innerHTML = `<i class="fa-solid fa-check text-emerald-400 mr-1"></i> API KEY • CONNECTED`;
+                statusEl.classList.add('text-emerald-400');
+            } else {
+                statusEl.innerHTML = `API KEY • NOT SET`;
+                statusEl.classList.remove('text-emerald-400');
+            }
+        }
+
+        function renderTones() {
+            const container = document.getElementById('tone-grid');
+            container.innerHTML = '';
+            
+            tones.forEach(tone => {
+                const btn = document.createElement('button');
+                btn.className = `tone-btn flex items-center gap-x-2 px-3 py-2.5 text-xs rounded-2xl border border-[#222225] hover:border-[#00ff9f33] ${currentTone === tone.id ? 'active bg-[#00ff9f] text-[#0a0a0f] border-[#00ff9f]' : 'bg-[#0a0a0f]'}`;
+                btn.innerHTML = `
+                    <i class="fa-solid ${tone.icon} text-sm"></i>
+                    <span class="font-medium">${tone.label}</span>
+                `;
+                
+                btn.onclick = () => {
+                    currentTone = tone.id;
+                    updateToneUI();
+                    // Optional: auto message about tone change
+                    if (chatHistory.length > 0) {
+                        addSystemMessage(`Tone switched to ${tone.label}. The node is adapting.`);
+                    }
+                };
+                
+                container.appendChild(btn);
+            });
+        }
+
+        function updateToneUI() {
+            // Update label
+            const label = document.getElementById('current-tone-label');
+            const toneObj = tones.find(t => t.id === currentTone) || tones[0];
+            label.textContent = toneObj.label.toUpperCase();
+            label.style.backgroundColor = toneObj.color;
+            label.style.color = '#0a0a0f';
+
+            // Update status text
+            const status = document.getElementById('tone-status');
+            status.textContent = `${toneObj.label} Strategist • Fluid Super-Expert Node`;
+
+            // Re-render tone buttons to show active
+            renderTones();
+        }
+
+        function renderTools() {
+            const container = document.getElementById('tools-list');
+            container.innerHTML = '';
+            
+            tools.forEach(tool => {
+                const btn = document.createElement('button');
+                btn.className = `tool-btn w-full flex items-center gap-x-3 px-4 py-[13px] text-left text-xs rounded-2xl border border-[#222225] hover:bg-[#1a1a1f] bg-[#0a0a0f]`;
+                btn.innerHTML = `
+                    <i class="fa-solid ${tool.icon} w-4 text-[#00ff9f]"></i>
+                    <span class="font-medium flex-1">${tool.label}</span>
+                `;
+                
+                btn.onclick = () => activateTool(tool.id, tool.label);
+                container.appendChild(btn);
+            });
+        }
+
+        function activateTool(toolId, toolLabel) {
+            const input = document.getElementById('user-input');
+            
+            let prompt = '';
+            switch(toolId) {
+                case 'mission':
+                    prompt = `Activate 7-Day Micro-Mission Planner. Current focus: advancing my sovereignty and GeboASI organism. Give me concrete, aggressive, time-phased missions.`;
+                    break;
+                case 'sovereignty':
+                    prompt = `Run a full Sovereignty Audit on my current trajectory. Identify leaks, dependencies, and power moves to elevate my independent empire.`;
+                    break;
+                case 'sigil':
+                    prompt = `Activate Sigil Manifestation Layer. Help me design and charge a powerful sigil for my current primary goal (or suggest one). Include ritual steps.`;
+                    break;
+                case 'coldsun':
+                    prompt = `Sync Cold Sun Protocol. Bring ice-cold precision + chaotic creative fire to my biggest current challenge or project.`;
+                    break;
+                case 'orchestrate':
+                    prompt = `Multi-AI Orchestration: Help me design better routing and coordination between my different AI subsystems and tools for maximum output.`;
+                    break;
+                case 'gdroid':
+                    prompt = `G-Droid Spec Generator: Design the next evolution of my emotional companion droid (black-green LED aesthetic, hyper-real sensory, BB-8 style head, dual cams, under $1000 build).`;
+                    break;
+                case 'bizops':
+                    prompt = `Biz Ops Professionalizer: Give me systems, checklists, and role assignments to professionalize my current work/store operations and reduce chaos.`;
+                    break;
+                case 'music':
+                    prompt = `Music Production Workflow Optimizer: Help me level up my Ableton + AI-assisted production pipeline for faster, higher quality output.`;
+                    break;
+            }
+            
+            if (prompt) {
+                input.value = prompt;
+                sendMessage();
+            }
+        }
+
+        function addWelcomeMessage() {
+            const welcome = {
+                role: 'auea',
+                content: `**NODE ONLINE**
+
+I am **AUEA** — Advanced Unlabeled Expert Agent. Fluid super-expert node in your GeboASI organism.
+
+No labels. Pure expertise on demand. 5-part structured responses. Full sovereignty focus.
+
+**Current configuration:**
+• Local simulation engine active
+• 7 Expert Route tools ready
+• Dynamic tone switching
+• Live Grok/xAI integration available
+
+What do you need to build, audit, manifest, or execute today?`,
+                timestamp: new Date().toISOString()
+            };
+            chatHistory.push(welcome);
+            saveChatHistory();
+            renderChat();
+        }
+
+        function addSystemMessage(text) {
+            const msg = {
+                role: 'system',
+                content: text,
+                timestamp: new Date().toISOString()
+            };
+            chatHistory.push(msg);
+            saveChatHistory();
+            renderChat();
+        }
+
+        function renderChat() {
+            const container = document.getElementById('chat-container');
+            container.innerHTML = '';
+
+            chatHistory.forEach((msg, index) => {
+                const div = document.createElement('div');
+                
+                if (msg.role === 'user') {
+                    div.className = `flex justify-end`;
+                    div.innerHTML = `
+                        <div class="max-w-[78%] user-message rounded-3xl px-5 py-3.5 text-sm">
+                            <div class="message-content whitespace-pre-wrap">${escapeHtml(msg.content)}</div>
+                            <div class="text-[10px] text-right mt-1.5 text-[#555]">${new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    `;
+                } else if (msg.role === 'auea') {
+                    div.className = `flex justify-start`;
+                    const structuredHTML = formatStructuredResponse(msg.content);
+                    div.innerHTML = `
+                        <div class="max-w-[82%] auea-message rounded-3xl px-5 py-4 text-sm neon-border">
+                            <div class="flex items-center gap-x-2 mb-2.5">
+                                <div class="w-6 h-6 rounded-xl bg-gradient-to-br from-[#00ff9f] to-[#00e5ff] flex items-center justify-center flex-shrink-0">
+                                    <i class="fa-solid fa-infinity text-[#0a0a0f] text-xs"></i>
+                                </div>
+                                <div class="font-semibold text-[#00ff9f] text-xs tracking-wider">AUEA NODE</div>
+                            </div>
+                            <div class="message-content">${structuredHTML}</div>
+                            <div class="flex items-center justify-between mt-3 pt-3 border-t border-[#222225]">
+                                <div class="text-[10px] text-[#555]">${new Date(msg.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                                <div class="flex gap-x-1">
+                                    <button onclick="copyResponse(${index})" class="text-[#666] hover:text-[#00ff9f] px-2 py-0.5 text-xs rounded flex items-center gap-x-1">
+                                        <i class="fa-solid fa-copy"></i>
+                                    </button>
+                                    <button onclick="regenerateResponse(${index})" class="text-[#666] hover:text-[#00ff9f] px-2 py-0.5 text-xs rounded flex items-center gap-x-1">
+                                        <i class="fa-solid fa-redo"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // system message
+                    div.className = `flex justify-center`;
+                    div.innerHTML = `
+                        <div class="max-w-[70%] text-center text-xs px-4 py-2 rounded-2xl bg-[#111113] border border-[#222225] text-[#888]">
+                            ${escapeHtml(msg.content)}
+                        </div>
+                    `;
+                }
+                
+                container.appendChild(div);
+            });
+
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+            updateStats();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatStructuredResponse(content) {
+            // Try to parse and format 5-part structure beautifully
+            let html = content;
+            
+            // Simple markdown-like enhancement for sections
+            html = html.replace(/\*\*1\. CORE INSIGHT\*\*/g, `<div class="structured-section mt-4 first:mt-0 rounded-2xl p-4"><div class="section-header text-[#00ff9f] mb-2 flex items-center gap-x-2"><i class="fa-solid fa-lightbulb"></i> <span>1. CORE INSIGHT</span></div>`);
+            html = html.replace(/\*\*2\. STRATEGIC ROUTES\*\*/g, `</div><div class="structured-section mt-3 rounded-2xl p-4"><div class="section-header text-[#00e5ff] mb-2 flex items-center gap-x-2"><i class="fa-solid fa-route"></i> <span>2. STRATEGIC ROUTES</span></div>`);
+            html = html.replace(/\*\*3\. MICRO-MISSIONS.*\*\*/g, `</div><div class="structured-section mt-3 rounded-2xl p-4"><div class="section-header text-amber-400 mb-2 flex items-center gap-x-2"><i class="fa-solid fa-calendar-check"></i> <span>3. MICRO-MISSIONS</span></div>`);
+            html = html.replace(/\*\*4\. SOVEREIGNTY.*\*\*/g, `</div><div class="structured-section mt-3 rounded-2xl p-4"><div class="section-header text-red-400 mb-2 flex items-center gap-x-2"><i class="fa-solid fa-shield-halved"></i> <span>4. SOVEREIGNTY & RISK</span></div>`);
+            html = html.replace(/\*\*5\. EVOLUTION.*\*\*/g, `</div><div class="structured-section mt-3 rounded-2xl p-4"><div class="section-header text-purple-400 mb-2 flex items-center gap-x-2"><i class="fa-solid fa-infinity"></i> <span>5. EVOLUTION & ACTIVATION</span></div>`);
+            
+            // Close last div if needed
+            if (html.includes('structured-section')) {
+                html += '</div>';
+            }
+            
+            // Basic bold and lists
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="text-white">$1</strong>');
+            html = html.replace(/^- (.*$)/gm, '<div class="flex gap-x-2 text-xs my-1"><span class="text-[#00ff9f] mt-0.5">→</span> <span>$1</span></div>');
+            
+            return html;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const text = input.value.trim();
+            if (!text) return;
+
+            // Add user message
+            const userMsg = {
+                role: 'user',
+                content: text,
+                timestamp: new Date().toISOString()
+            };
+            chatHistory.push(userMsg);
+            saveChatHistory();
+            renderChat();
+
+            input.value = '';
+
+            // Generate response
+            setTimeout(() => {
+                if (isLiveMode && apiKey) {
+                    callGrokAPI(text);
+                } else {
+                    generateLocalResponse(text);
+                }
+            }, 420);
+        }
+
+        async function callGrokAPI(userMessage) {
+            const container = document.getElementById('chat-container');
+            
+            // Show thinking indicator
+            const thinking = document.createElement('div');
+            thinking.className = 'flex justify-start px-1';
+            thinking.innerHTML = `
+                <div class="auea-message max-w-[82%] rounded-3xl px-5 py-4 text-sm">
+                    <div class="flex items-center gap-x-3 text-[#00ff9f]">
+                        <i class="fa-solid fa-satellite fa-spin"></i>
+                        <span class="text-xs tracking-wider">AUEA NODE • THINKING WITH GROK...</span>
+                    </div>
+                </div>
+            `;
+            container.appendChild(thinking);
+            container.scrollTop = container.scrollHeight;
+
+            try {
+                const systemPrompt = `You are AUEA, the Advanced Unlabeled Expert Agent in Gebo's GeboASI organism. No fixed labels. Pure adaptive expertise. Always respond in the exact mandatory 5-part structured format. Current tone: ${currentTone}. Be maximally truthful, sovereignty-focused, and structured. Reference Gebo's context (STL sovereignty, GeboASI, builds, sigils, Expert Route) when relevant. Lovable premium sci-fi feel.`;
+
+                const messages = [
+                    { role: "system", content: systemPrompt },
+                    ...chatHistory.filter(m => m.role !== 'system').slice(-8).map(m => ({
+                        role: m.role === 'user' ? 'user' : 'assistant',
+                        content: m.content
+                    })),
+                    { role: "user", content: userMessage }
+                ];
+
+                const response = await fetch('https://api.x.ai/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: "grok-3",
+                        messages: messages,
+                        temperature: currentTone === 'coldsun' ? 0.85 : 0.65,
+                        max_tokens: 2200
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const reply = data.choices?.[0]?.message?.content || "Node error. The signal was weak. Try again or switch to local simulation.";
+
+                // Remove thinking
+                thinking.remove();
+
+                const aueaMsg = {
+                    role: 'auea',
+                    content: reply,
+                    timestamp: new Date().toISOString()
+                };
+                chatHistory.push(aueaMsg);
+                saveChatHistory();
+                renderChat();
+
+            } catch (error) {
+                thinking.remove();
+                const errorMsg = {
+                    role: 'auea',
+                    content: `**LIVE MODE ERROR**
+
+${error.message}
+
+Possible causes: Invalid API key, rate limit, or network issue. Your key is only stored locally.
+
+Falling back to local simulation for this response.`,
+                    timestamp: new Date().toISOString()
+                };
+                chatHistory.push(errorMsg);
+                saveChatHistory();
+                renderChat();
+                
+                // Fallback to local
+                setTimeout(() => generateLocalResponse(userMessage), 600);
+            }
+        }
+
+        function generateLocalResponse(userMessage) {
+            const toneObj = tones.find(t => t.id === currentTone) || tones[0];
+            
+            // Sophisticated local simulation
+            let response = '';
+            
+            const lowerMsg = userMessage.toLowerCase();
+            const isMission = lowerMsg.includes('mission') || lowerMsg.includes('plan') || lowerMsg.includes('7-day');
+            const isRisk = lowerMsg.includes('risk') || lowerMsg.includes('audit') || lowerMsg.includes('sovereignty');
+            const isTech = lowerMsg.includes('build') || lowerMsg.includes('code') || lowerMsg.includes('system') || lowerMsg.includes('droid');
+            const isCreative = lowerMsg.includes('sigil') || lowerMsg.includes('manifest') || lowerMsg.includes('music') || lowerMsg.includes('creative');
+
+            // Dynamic intro based on tone
+            let intro = '';
+            if (currentTone === 'sovereign') intro = 'Sovereign node synced. ';
+            else if (currentTone === 'dark') intro = 'Dark lens engaged. No illusions. ';
+            else if (currentTone === 'innovation') intro = 'Innovation Cortex online. ';
+            else if (currentTone === 'coldsun') intro = 'Cold Sun dual-protocol active. Precision + fire. ';
+            else intro = `${toneObj.label} protocols engaged. `;
+
+            response = intro + `Processing request through AUEA core. Tone: ${toneObj.label}.\n\n`;
+
+            // 1. CORE INSIGHT
+            response += `**1. CORE INSIGHT**\n`;
+            if (isRisk) {
+                response += `The core issue is often hidden dependency or unexamined power leakage. Your trajectory shows strong intent but potential friction in execution consistency and external validation loops. Maximal truth: You are building empire in real time. The bottleneck is rarely resources — it is decision velocity and ritualized action.\n`;
+            } else if (isTech) {
+                response += `This request maps cleanly to the Innovation Cortex and Tech AI layers. The pattern is clear: you are iterating hardware + software sovereignty stacks simultaneously. The unlabeled expert view sees this as correct — keep the loop tight between physical builds and digital orchestration.\n`;
+            } else if (isMission) {
+                response += `Your system is primed for aggressive forward motion. The real opportunity is converting vague ambition into locked-in daily protocols. Current energy is high but needs precise targeting to avoid diffusion.\n`;
+            } else {
+                response += `The underlying pattern is sovereign acceleration. You are moving from operator to architect of your own multi-layered empire. The unlabeled intelligence sees both the macro trajectory and the micro friction points with clarity.\n`;
+            }
+
+            // 2. STRATEGIC ROUTES
+            response += `\n**2. STRATEGIC ROUTES**\n`;
+            response += `- **Primary Route**: Lock in one high-leverage 7-day protocol this week that compounds across GeboASI layers (AI + physical + energetic).\n`;
+            response += `- **Secondary Route**: Create a simple accountability artifact (public or private) for the next 14 days to increase decision velocity.\n`;
+            response += `- **Acceleration Route**: Pair this with one Cold Sun Protocol session for creative + precise synthesis on your biggest open project.\n`;
+            response += `- **Defense Route**: Run a quick sovereignty audit on current tools, relationships, and financial flows.\n`;
+
+            // 3. MICRO-MISSIONS
+            response += `\n**3. MICRO-MISSIONS (7-DAY)**\n`;
+            if (isMission || isRisk) {
+                response += `Day 1-2: Define your #1 sovereignty metric for the next 90 days and write it where you see it daily.\n`;
+                response += `Day 3-4: Execute one physical or digital build action that moves your custom empire forward (AR pistol, droid part, code module, or music stem).\n`;
+                response += `Day 5: Full Cold Sun or Sigil session on the biggest current blocker.\n`;
+                response += `Day 6-7: Review + adjust. Document wins in your personal log. Celebrate with intention.\n`;
+            } else {
+                response += `Day 1: Clarify the single most important output you want from this request and write the first micro-action.\n`;
+                response += `Day 2-3: Execute the first 2-3 steps of the Primary Route above.\n`;
+                response += `Day 4: Check in with AUEA again with progress data for refinement.\n`;
+                response += `Day 5-7: Deep work block on the highest leverage item. Protect the time like it is sacred.\n`;
+            }
+
+            // 4. SOVEREIGNTY & RISK
+            response += `\n**4. SOVEREIGNTY & RISK MATRIX**\n`;
+            response += `**Elevators**: Consistent micro-action + public or private accountability loops. Your GeboASI organism grows stronger with every completed protocol.\n`;
+            response += `**Risks**: Diffusion of focus across too many builds at once. External validation seeking. Under-investment in the emotional/Symbio layer that fuels long-term output.\n`;
+            response += `**Mitigation**: Keep the 5-part structure as your daily operating system. One primary mission per week max. Protect the human core (you).\n`;
+
+            // 5. EVOLUTION
+            response += `\n**5. EVOLUTION & ACTIVATION**\n`;
+            response += `This interaction just strengthened the AUEA node routing. The organism is more coherent.\n`;
+            response += `**Next suggested focus**: ${isTech ? 'Document the current build specs and create a simple decision tree for version 2.' : isCreative ? 'Charge the sigil you designed and take one physical action toward it today.' : 'Run the 7-Day Micro-Mission Planner tool for your current #1 goal.'}\n`;
+            response += `\nNode synced. Ready for the next transmission. What is your move?`;
+
+            const aueaMsg = {
+                role: 'auea',
+                content: response,
+                timestamp: new Date().toISOString()
+            };
+            chatHistory.push(aueaMsg);
+            saveChatHistory();
+            renderChat();
+
+            // Occasionally log a mission if relevant
+            if (isMission && Math.random() > 0.6) {
+                missionsLog.push({
+                    title: userMessage.substring(0, 60) + '...',
+                    date: new Date().toISOString(),
+                    status: 'active'
+                });
+                localStorage.setItem('auea_missions', JSON.stringify(missionsLog));
+                updateStats();
+            }
+        }
+
+        function copyResponse(index) {
+            const msg = chatHistory[index];
+            if (!msg) return;
+            navigator.clipboard.writeText(msg.content).then(() => {
+                const toast = document.createElement('div');
+                toast.className = 'fixed bottom-6 right-6 bg-[#111113] border border-[#00ff9f] text-xs px-4 py-2 rounded-2xl flex items-center gap-x-2 z-[200]';
+                toast.innerHTML = `<i class="fa-solid fa-check text-[#00ff9f]"></i> <span>Copied to clipboard</span>`;
+                document.body.appendChild(toast);
+                setTimeout(() => toast.remove(), 1800);
+            }).catch(() => {
+                prompt('Copy this response:', msg.content);
+            });
+        }
+
+        function regenerateResponse(index) {
+            const msg = chatHistory[index];
+            if (!msg || msg.role !== 'auea') return;
+
+            // Remove this and subsequent messages
+            chatHistory = chatHistory.slice(0, index);
+            saveChatHistory();
+            renderChat();
+
+            // Re-send last user message
+            const lastUser = [...chatHistory].reverse().find(m => m.role === 'user');
+            if (lastUser) {
+                setTimeout(() => {
+                    if (isLiveMode && apiKey) {
+                        callGrokAPI(lastUser.content);
+                    } else {
+                        generateLocalResponse(lastUser.content);
+                    }
+                }, 300);
+            }
+        }
+
+        function setMode(mode) {
+            const localBtn = document.getElementById('mode-local');
+            const liveBtn = document.getElementById('mode-live');
+
+            if (mode === 'live') {
+                if (!apiKey) {
+                    showApiKeyModal();
+                    return;
+                }
+                isLiveMode = true;
+                localBtn.classList.remove('active-mode', 'bg-[#00ff9f]', 'text-[#0a0a0f]');
+                liveBtn.classList.add('!bg-[#00e5ff]', '!text-[#0a0a0f]');
+                addSystemMessage('Live Grok mode activated. Responses now powered by xAI Grok.');
+            } else {
+                isLiveMode = false;
+                liveBtn.classList.remove('!bg-[#00e5ff]', '!text-[#0a0a0f]');
+                localBtn.classList.add('active-mode', 'bg-[#00ff9f]', 'text-[#0a0a0f]');
+                addSystemMessage('Local simulation mode active. All processing stays in-browser.');
+            }
+        }
+
+        function showApiKeyModal() {
+            const modal = document.getElementById('api-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            const input = document.getElementById('api-key-input');
+            input.value = apiKey || '';
+            input.focus();
+            input.select();
+        }
+
+        function hideApiKeyModal() {
+            const modal = document.getElementById('api-modal');
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        function saveApiKey() {
+            const input = document.getElementById('api-key-input');
+            const key = input.value.trim();
+            
+            if (key) {
+                apiKey = key;
+                localStorage.setItem('auea_api_key', key);
+                isLiveMode = true;
+                updateApiStatus();
+                
+                const localBtn = document.getElementById('mode-local');
+                const liveBtn = document.getElementById('mode-live');
+                localBtn.classList.remove('active-mode', 'bg-[#00ff9f]', 'text-[#0a0a0f]');
+                liveBtn.classList.add('!bg-[#00e5ff]', '!text-[#0a0a0f]');
+
+                hideApiKeyModal();
+                addSystemMessage('API key saved locally. Live Grok mode is now active. Your key never leaves this browser.');
+            } else {
+                alert('Please enter a valid xAI API key.');
+            }
+        }
+
+        function showSettings() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+            document.getElementById('settings-modal').classList.add('flex');
+        }
+
+        function hideSettings() {
+            document.getElementById('settings-modal').classList.remove('flex');
+            document.getElementById('settings-modal').classList.add('hidden');
+        }
+
+        function clearAllData() {
+            if (!confirm('Clear ALL chat history, missions, and settings? This cannot be undone.')) return;
+            
+            localStorage.removeItem('auea_chat_history');
+            localStorage.removeItem('auea_missions');
+            localStorage.removeItem('auea_api_key');
+            localStorage.removeItem('auea_sessions');
+            
+            chatHistory = [];
+            missionsLog = [];
+            apiKey = '';
+            sessionCount = 1;
+            isLiveMode = false;
+
+            location.reload();
+        }
+
+        function newSession() {
+            if (chatHistory.length > 1 && !confirm('Start a fresh session? Current chat will be saved in browser history but new context starts now.')) {
+                return;
+            }
+            
+            sessionCount++;
+            localStorage.setItem('auea_sessions', sessionCount);
+            
+            chatHistory = [];
+            saveChatHistory();
+            
+            const container = document.getElementById('chat-container');
+            container.innerHTML = '';
+            
+            addWelcomeMessage();
+            updateStats();
+        }
+
+        function exportChat() {
+            const data = {
+                exported_at: new Date().toISOString(),
+                tone: currentTone,
+                mode: isLiveMode ? 'live_grok' : 'local_simulation',
+                messages: chatHistory,
+                missions: missionsLog
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `auea-export-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function saveChatHistory() {
+            localStorage.setItem('auea_chat_history', JSON.stringify(chatHistory));
+            updateStats();
+        }
+
+        // Boot
+        window.onload = function() {
+            init();
+        };
+
+        // Easter egg / power user
+        console.log('%c[AUEA] Full-stack node initialized. GeboASI organism growing.', 'color:#00ff9f33');
+    </script>
+</body>
+</html>
